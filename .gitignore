@@ -31,5 +31,6 @@
 *.out
 *.app
 
-/cmake-build-debug/
-/.idea/
+# TP1 compiled
+/TP1/cmake-build-debug/
+/TP1/.idea/
