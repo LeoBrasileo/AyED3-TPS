@@ -1,3 +1,17 @@
 # ninja log v5
-0	238	1680289025913998712	CMakeFiles/TP1.dir/main.cpp.o	9606ad1e0be0dbff
+1	271	1680290791178794993	CMakeFiles/TP1.dir/Ejercicios/Ej1.o	7b297e885ed57830
+0	507	1680290722192448735	CMakeFiles/TP1.dir/main.o	ecf5034eb48b1e0a
+0	32	1680291037422403896	build.ninja	76de7971b31ee369
+0	2334	1680290724016402105	lib/googletest-master/googlemock/gtest/CMakeFiles/gtest.dir/src/gtest-all.cc.o	f9899b7b4057edae
+0	506	1680290722192448735	lib/googletest-master/googlemock/gtest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o	e317b92132cada40
+2376	2524	1680290724208397210	/home/clinux01/Escritorio/leo/AyED3-TPS/TP1/TP1	a463721c2c162654
 239	284	1680289025957999598	TP1	7424517d60e97a12
+2335	2365	1680290724052401187	lib/googletest-master/googlemock/gtest/libgtestd.a	3cd8e16e1aba770c
+2365	2376	1680290724056401085	lib/googletest-master/googlemock/gtest/libgtest_maind.a	29790454e814ebd1
+0	238	1680289025913998712	CMakeFiles/TP1.dir/main.cpp.o	9606ad1e0be0dbff
+1	588	1680290956223628567	CMakeFiles/TP1.dir/tests/CuadradoMagicoTEST.o	375c8503fdb1a9e5
+1	269	1680290940499888658	CMakeFiles/TP1.dir/ejercicios/ej1.o	26f2de0bcb35e7cd
+0	32	1680291037422403896	build.ninja	76de7971b31ee369
+1	108	1680291037534402335	/home/clinux01/Escritorio/leo/AyED3-TPS/TP1/TP1	93261dc23d8377fa
+1	571	1680291076085884640	CMakeFiles/TP1.dir/tests/CuadradoMagicoTEST.o	375c8503fdb1a9e5
+571	673	1680291076189883296	/home/clinux01/Escritorio/leo/AyED3-TPS/TP1/TP1	93261dc23d8377fa
