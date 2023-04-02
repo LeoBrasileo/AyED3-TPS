@@ -1,91 +1,94 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include <list>
 
 using namespace std;
 
 int N, K, magicNum;
-vector <vector<int>> squareFinal;
+int k = 0;
+vector <vector<int>> square;
+vector<int> usados;
 
-bool fila(int num, int row, vector <vector<int>> &square) {
+bool filaMag(int row) {
     int sum = 0;
     for (int i = 0; i < N; i++) {
-        int casilla = square[row][i];
-        sum += casilla;
+        sum += square[row][i];
     }
-    return (sum + num) <= magicNum;
+    return sum == magicNum;
 }
 
-bool columna(int num, int col, vector <vector<int>> &square) {
+bool columnaMag(int col) {
     int sum = 0;
     for (int i = 0; i < N; i++) {
-        int casilla = square[i][col];
-        sum += casilla;
+        sum += square[i][col];
     }
-    return (sum + num) <= magicNum;
+    return sum == magicNum;
 }
 
-bool diagonal(int num, int row, int col, vector <vector<int>> &square) {
+bool diagonalMag() {
     int sum = 0;
     for (int i = 0; i < N; i++) {
-        int casilla = square[i][i];
-        sum += casilla;
+        sum += square[i][i];
     }
-    if(row == col && row == N-1)
-        return sum + num == magicNum;
-    else
-        return (sum + num) <= magicNum;
+    return sum == magicNum;
 }
 
-bool antidiagonal(int num, int row, int col, vector <vector<int>> &square) {
+bool antidiagonalMag() {
     int sum = 0;
     for (int i = 0; i < N; i++) {
-        int casilla = square[i][N - i - 1];
-        sum += casilla;
+        sum += square[i][N - i - 1];
     }
-    /*if (col == 0 && row == N-1)
-        return sum + num == magicNum;
-    else
-        return (sum + num) <= magicNum;*/
-    return (sum + num) <= magicNum;
+    return sum == magicNum;
+}
+
+bool esMagico(){
+    for (int i = 0; i < N; i++) {
+        if (!filaMag(i) || !columnaMag(i)) {
+            return false;
+        }
+    }
+    if (!diagonalMag() || !antidiagonalMag()) {
+        return false;
+    }
+    return true;
 }
 
 
-bool utilizable(int num, int row, int col, vector <vector<int>> &actSquare, vector<int> &usados) {
+bool utilizable(int num) {
     for (int i = 0; i < usados.size(); i++) {
         if (usados[i] == num) {
             return false;
         }
     }
-
-    bool f = fila(num, row, actSquare);
-    bool c = columna(num, col, actSquare);
-    bool d = diagonal(num, row, col, actSquare);
-    bool ad = antidiagonal(num, row, col, actSquare);
-    return f && c && d && ad;
+    return true;
 }
 
-bool armarCuadradoMagico(vector<vector<int>> actSquare, vector<int> usados, int row, int col) {
+bool armarCuadradoMagico(int row, int col) {
+    if (col == N && row == N-1){
+        if (esMagico()){
+            k++;
+            if (k == K){
+                return true;
+            }
+        }
+    }
+
+    //recorro la matriz de izquierda a derecha y de arriba a abajo
+    //si llego a la ultima columna, paso a la siguiente fila
     if (col == N) {
         col = 0;
         row++;
     }
 
-    if (row == N) {
-        squareFinal = actSquare;
-        return true;
-    }
-
     for (int num = 1; num <= N*N; num++) {
-        if (utilizable(num, row, col, actSquare, usados)) {
-            actSquare[row][col] = num;
+        if (utilizable(num)) {
+            square[row][col] = num;
             usados.push_back(num);
-            if (armarCuadradoMagico(actSquare, usados, row, col + 1)) {
+            if (armarCuadradoMagico(row, col + 1)) {
                 return true;
             }
-            //para que pueda probar con los demas numeros
-            actSquare[row][col] = 0;
+            //para que pueda probar con los demas numeros. backtrack
+            square[row][col] = 0;
             usados.pop_back();
         }
     }
@@ -95,15 +98,15 @@ bool armarCuadradoMagico(vector<vector<int>> actSquare, vector<int> usados, int 
 int main() {
     // Leo la entrada
     cin >> N >> K;
-    //formula sacada de la guia
-    magicNum = (pow(N, 3) + N) / 2;
 
-    squareFinal = vector<vector<int>>(N, vector<int>(N, 0));
+    magicNum = (pow(N, 3) + N) / 2; //formula sacada de la guia
+    square = vector<vector<int>>(N, vector<int>(N, 0));
+
     //imprimo la salida
-    if (armarCuadradoMagico(squareFinal, vector<int>(0), 0, 0)) {
+    if (armarCuadradoMagico(0, 0)) {
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                cout << squareFinal[i][j] << " ";
+                cout << square[i][j] << " ";
             }
             cout << endl;
         }
@@ -111,6 +114,5 @@ int main() {
         cout << -1 << endl;
     }
 
-    //cout << N << K;
     return 0;
 }
