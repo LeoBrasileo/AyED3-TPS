@@ -54,13 +54,29 @@ bool esMagico(){
 }
 
 
-bool utilizable(int num) {
+bool noUsado(int num) {
     for (int i = 0; i < usados.size(); i++) {
         if (usados[i] == num) {
             return false;
         }
     }
     return true;
+}
+
+bool poda(int row, int col) {
+    bool completaFila = col == N - 1;
+    bool completaCol = row == N - 1;
+    if(completaFila){return !filaMag(row);}
+    if(completaCol){return !columnaMag(col);}
+
+    //QVQ las sumas parciales en fila y columna son menor a la suma magica
+    int sumFila = 0;
+    int sumCol = 0;
+    for (int i = 0; i < N; i++) {
+        sumFila += square[row][i];
+        sumCol += square[i][col];
+    }
+    return sumFila >= magicNum || sumCol >= magicNum;
 }
 
 bool armarCuadradoMagico(int row, int col) {
@@ -74,6 +90,7 @@ bool armarCuadradoMagico(int row, int col) {
     }
 
     //recorro la matriz de izquierda a derecha y de arriba a abajo
+    //este orden tambien me permite respetar el orden lexicografico
     //si llego a la ultima columna, paso a la siguiente fila
     if (col == N) {
         col = 0;
@@ -81,11 +98,13 @@ bool armarCuadradoMagico(int row, int col) {
     }
 
     for (int num = 1; num <= N*N; num++) {
-        if (utilizable(num)) {
+        if (noUsado(num)) {
             square[row][col] = num;
             usados.push_back(num);
-            if (armarCuadradoMagico(row, col + 1)) {
-                return true;
+            if (!poda(row, col)){
+                if (armarCuadradoMagico(row, col + 1)) {
+                    return true;
+                }
             }
             //para que pueda probar con los demas numeros. backtrack
             square[row][col] = 0;
