@@ -7,7 +7,7 @@ using namespace std;
 int N, K, magicNum;
 int k = 0;
 vector <vector<int>> square;
-vector<int> usados;
+vector<bool> usados;
 
 bool filaMag(int row) {
     int sum = 0;
@@ -56,12 +56,7 @@ bool esMagico(){
 
 
 bool noUsado(int num) {
-    for (int i = 0; i < usados.size(); i++) {
-        if (usados[i] == num) {
-            return false;
-        }
-    }
-    return true;
+    return !usados[num - 1];
 }
 
 bool poda(int row, int col) {
@@ -73,15 +68,11 @@ bool poda(int row, int col) {
     //QVQ las sumas parciales en fila y columna son menor a la suma magica
     int sumFila = 0;
     int sumCol = 0;
-    int sumDiag = 0;
-    int sumAntidiag = 0;
     for (int i = 0; i < N; i++) {
         sumFila += square[row][i];
         sumCol += square[i][col];
-        sumDiag += square[i][i];
-        sumAntidiag += square[i][N - i - 1];
     }
-    return sumFila >= magicNum || sumCol >= magicNum || sumDiag >= magicNum || sumAntidiag >= magicNum;
+    return sumFila >= magicNum || sumCol >= magicNum;
 }
 
 bool armarCuadradoMagico(int row, int col) {
@@ -105,7 +96,7 @@ bool armarCuadradoMagico(int row, int col) {
     for (int num = 1; num <= N*N; num++) {
         if (noUsado(num)) {
             square[row][col] = num;
-            usados.push_back(num);
+            usados[num - 1] = true;
             if (!poda(row, col)){
                 if (armarCuadradoMagico(row, col + 1)) {
                     return true;
@@ -113,7 +104,7 @@ bool armarCuadradoMagico(int row, int col) {
             }
             //para que pueda probar con los demas numeros. backtrack
             square[row][col] = 0;
-            usados.pop_back();
+            usados[num - 1] = false;
         }
     }
     return false;
@@ -125,6 +116,7 @@ int main() {
 
     magicNum = (pow(N, 3) + N) / 2; //formula sacada de la guia
     square = vector<vector<int>>(N, vector<int>(N, 0));
+    usados = vector<bool>(N*N,false);
 
     //imprimo la salida
     if (armarCuadradoMagico(0, 0)) {
