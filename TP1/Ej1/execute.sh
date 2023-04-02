@@ -1,2 +1,2 @@
-g++ -o ejec main.cpp
+g++ -o main main.cpp
 ./ejec < test.txt
