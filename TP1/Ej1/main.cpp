@@ -42,6 +42,7 @@ bool antidiagonalMag() {
 }
 
 bool esMagico(){
+    // Verifico que la suma de cada fila y columna sea igual a la suma magica
     for (int i = 0; i < N; i++) {
         if (!filaMag(i) || !columnaMag(i)) {
             return false;
@@ -72,11 +73,15 @@ bool poda(int row, int col) {
     //QVQ las sumas parciales en fila y columna son menor a la suma magica
     int sumFila = 0;
     int sumCol = 0;
+    int sumDiag = 0;
+    int sumAntidiag = 0;
     for (int i = 0; i < N; i++) {
         sumFila += square[row][i];
         sumCol += square[i][col];
+        sumDiag += square[i][i];
+        sumAntidiag += square[i][N - i - 1];
     }
-    return sumFila >= magicNum || sumCol >= magicNum;
+    return sumFila >= magicNum || sumCol >= magicNum || sumDiag >= magicNum || sumAntidiag >= magicNum;
 }
 
 bool armarCuadradoMagico(int row, int col) {
