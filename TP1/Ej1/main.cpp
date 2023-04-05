@@ -8,48 +8,34 @@ int N, K, magicNum;
 int k = 0;
 vector <vector<int>> square;
 vector<bool> usados;
+vector<int> sumFila, sumCol;
+int sumDiag = 0, sumAntidiag = 0;
 
 bool filaMag(int row) {
-    int sum = 0;
-    for (int i = 0; i < N; i++) {
-        sum += square[row][i];
-    }
-    return sum == magicNum;
+    return sumFila[row] == magicNum;
 }
 
 bool columnaMag(int col) {
-    int sum = 0;
-    for (int i = 0; i < N; i++) {
-        sum += square[i][col];
-    }
-    return sum == magicNum;
+    return sumCol[col] == magicNum;
 }
 
 bool diagonalMag() {
-    int sum = 0;
-    for (int i = 0; i < N; i++) {
-        sum += square[i][i];
-    }
-    return sum == magicNum;
+    return sumDiag == magicNum;
 }
 
 bool antidiagonalMag() {
-    int sum = 0;
-    for (int i = 0; i < N; i++) {
-        sum += square[i][N - i - 1];
-    }
-    return sum == magicNum;
+    return sumAntidiag == magicNum;
 }
 
 bool esMagico(){
     // Verifico que la suma de cada fila y columna sea igual a la suma magica
+    if (!diagonalMag() || !antidiagonalMag()) {
+        return false;
+    }
     for (int i = 0; i < N; i++) {
         if (!filaMag(i) || !columnaMag(i)) {
             return false;
         }
-    }
-    if (!diagonalMag() || !antidiagonalMag()) {
-        return false;
     }
     return true;
 }
@@ -59,20 +45,25 @@ bool noUsado(int num) {
     return !usados[num - 1];
 }
 
-bool poda(int row, int col) {
+bool poda(int row, int col, int num) {
     bool completaFila = col == N - 1;
     bool completaCol = row == N - 1;
+    bool esDiagonal = row == col;
+    bool esAntiDiag = row + col == N - 1;
+
+    if (esDiagonal)
+        sumDiag += num;
+    if (esAntiDiag)
+        sumAntidiag += num;
+
+    sumFila[row] += num;
+    sumCol[col] += num;
+
     if(completaFila){return !filaMag(row);}
     if(completaCol){return !columnaMag(col);}
 
     //QVQ las sumas parciales en fila y columna son menor a la suma magica
-    int sumFila = 0;
-    int sumCol = 0;
-    for (int i = 0; i < N; i++) {
-        sumFila += square[row][i];
-        sumCol += square[i][col];
-    }
-    return sumFila >= magicNum || sumCol >= magicNum;
+    return sumFila[row] >= magicNum || sumCol[col] >= magicNum || sumDiag >= magicNum || sumAntidiag >= magicNum;
 }
 
 bool armarCuadradoMagico(int row, int col) {
@@ -97,7 +88,7 @@ bool armarCuadradoMagico(int row, int col) {
         if (noUsado(num)) {
             square[row][col] = num;
             usados[num - 1] = true;
-            if (!poda(row, col)){
+            if (!poda(row, col, num)){
                 if (armarCuadradoMagico(row, col + 1)) {
                     return true;
                 }
@@ -105,18 +96,31 @@ bool armarCuadradoMagico(int row, int col) {
             //para que pueda probar con los demas numeros. backtrack
             square[row][col] = 0;
             usados[num - 1] = false;
+            //si podo devuelvo las sums parciales a su estado original
+            sumFila[row] -= num;
+            sumCol[col] -= num;
+            if (row == col)
+                sumDiag -= num;
+            if (row + col == N - 1)
+                sumAntidiag -= num;
         }
     }
     return false;
+}
+
+void inicializar() {
+    magicNum = (pow(N, 3) + N) / 2; //formula sacada de la guia
+    square = vector<vector<int>>(N, vector<int>(N, 0));
+    usados = vector<bool>(N*N,false);
+    sumFila = vector<int>(N,0);
+    sumCol = vector<int>(N,0);
 }
 
 int main() {
     // Leo la entrada
     cin >> N >> K;
 
-    magicNum = (pow(N, 3) + N) / 2; //formula sacada de la guia
-    square = vector<vector<int>>(N, vector<int>(N, 0));
-    usados = vector<bool>(N*N,false);
+    inicializar();
 
     //imprimo la salida
     if (armarCuadradoMagico(0, 0)) {
