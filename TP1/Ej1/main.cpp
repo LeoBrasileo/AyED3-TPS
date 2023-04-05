@@ -28,7 +28,7 @@ bool antidiagonalMag() {
 }
 
 bool esMagico(){
-    // Verifico que la suma de cada fila y columna sea igual a la suma magica
+    // Verifico que las sumas parciales de las filas y columnas sean iguales a la suma magica
     if (!diagonalMag() || !antidiagonalMag()) {
         return false;
     }
