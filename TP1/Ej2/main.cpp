@@ -1,30 +1,44 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <map>
 
 using namespace std;
 
 vector<int> operandos;
 int resto, divisor;
+map<pair<int,int>, bool> cache; // <indice, acumulado>, resParcial
+
+int calcResto(int num){
+    return num % divisor;
+}
 
 bool buscarOpsAux(int indice, int acumulado){
-    if (indice == operandos.size()){
-        return (acumulado % divisor == resto);
-    }
+    int n = operandos.size();
+    pair<int,int> key = make_pair(indice, acumulado);
+
+    if (indice == n)
+        return acumulado == resto;
+
+    if (cache.find(key) != cache.end())
+        return cache[key];
 
     int num = operandos[indice];
 
-    bool suma = buscarOpsAux(indice + 1, acumulado + num);
-    bool resta = buscarOpsAux(indice + 1, acumulado - num);
-    bool mult = buscarOpsAux(indice + 1, acumulado * num);
-    bool pot = buscarOpsAux(indice + 1, pow(acumulado, num));
+    bool suma = buscarOpsAux(indice + 1, calcResto(acumulado + num));
+    bool resta = buscarOpsAux(indice + 1, calcResto(acumulado - num));
+    bool mult = buscarOpsAux(indice + 1, calcResto(acumulado * num));
+    bool pot = buscarOpsAux(indice + 1, calcResto(pow(acumulado, num)));
 
-    return suma || resta || mult || pot;
+    bool res = suma || resta || mult || pot;
+    cache[key] = res;
+    return res;
 }
 
 bool buscarOperaciones(){
     bool res = buscarOpsAux(0, 0);
     operandos.clear();
+    cache.clear();
     return res;
 }
 
