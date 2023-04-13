@@ -13,7 +13,7 @@ int calcResto(int num){
     return num % divisor;
 }
 
-bool buscarOpsAux(int indice, int acumulado){
+bool buscarOpsAux(int indice, unsigned long int acumulado){
     int n = operandos.size();
     pair<int,int> key = make_pair(indice, acumulado);
 
@@ -25,12 +25,11 @@ bool buscarOpsAux(int indice, int acumulado){
 
     int num = operandos[indice];
 
-    bool suma = buscarOpsAux(indice + 1, calcResto(acumulado + num));
-    bool resta = buscarOpsAux(indice + 1, calcResto(acumulado - num));
-    bool mult = buscarOpsAux(indice + 1, calcResto(acumulado * num));
-    bool pot = buscarOpsAux(indice + 1, calcResto(pow(acumulado, num)));
+    bool res = buscarOpsAux(indice + 1, calcResto(acumulado + num))
+    || buscarOpsAux(indice + 1, calcResto(acumulado - num))
+    || buscarOpsAux(indice + 1, calcResto(acumulado * num))
+    ||buscarOpsAux(indice + 1, calcResto(pow(acumulado, num)));
 
-    bool res = suma || resta || mult || pot;
     cache[key] = res;
     return res;
 }
