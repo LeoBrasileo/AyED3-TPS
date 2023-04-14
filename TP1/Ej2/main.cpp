@@ -9,26 +9,32 @@ unsigned long long int r, m;
 vector<vector<int>> cache; // <indice, acumulado>, resParcial
 //la resParcial es -1 si aun no se sabe, 0 si es false, 1 si es true
 
-unsigned long long int calcResto(unsigned long int act, int num){
+int restoResta(unsigned long long int act, long long int num){
     //no puede ser negativo
     int resta = act - num;
-    if (resta < 0) {
-        return calcResto(act, num - m);
-    }
-    return resta;
+    while (resta < 0)
+        resta = resta + m;
+
+    return resta % m;
 }
 
-unsigned long long int mod_bin_exp(unsigned long long int x, unsigned long long int y) {
+int restoMult(long long int act, long long int num){
+    unsigned long long mult = act * num;
+    long long resto = mult % m;
+    return (int) resto;
+}
+
+int mod_bin_exp(int x, int y) {
     if (y == 0)
         return 1;
-    unsigned long long int half = mod_bin_exp(x, y / 2);
+    int half = mod_bin_exp(x, y / 2);
 
     if (y % 2 == 0)
         return half*half % m;
     if (y % 2 == 1)
         return (((half * half) % m) * x) % m;
 
-    return 0;
+    return 1; //no deberia llegar aca, es solo por los warnings
 }
 
 bool buscarOpsAux(int indice, unsigned long long int acumulado){
@@ -39,12 +45,11 @@ bool buscarOpsAux(int indice, unsigned long long int acumulado){
         return cache[indice][acumulado] == 1;
 
     unsigned long long int num = operandos[indice];
-    unsigned long long int mult = acumulado * num;
 
-    bool res = buscarOpsAux(indice + 1, (acumulado + num) % m)
-    || buscarOpsAux(indice + 1, calcResto(acumulado, num))
-    || buscarOpsAux(indice + 1, mult % m)
-    ||buscarOpsAux(indice + 1, mod_bin_exp(acumulado, num));
+    bool res = buscarOpsAux(indice + 1, ((acumulado + num) % m))
+    || buscarOpsAux(indice + 1, restoResta(acumulado, num))
+    || buscarOpsAux(indice + 1, restoMult(acumulado, num))
+    || buscarOpsAux(indice + 1, mod_bin_exp(acumulado, num));
 
     cache[indice][acumulado] = res ? 1 : 0;
     return res;
@@ -54,7 +59,11 @@ int main() {
     int C; cin >> C;
     for(int i = 0; i < C; i++){
         cin >> n >> r >> m;
-        if (r > m){
+        if (n == 0 && r == 0){
+            cout << "Si" << endl;
+            continue;
+        }
+        if (r >= m || (m == 0 && r != 0) || n == 0){
             cout << "No" << endl;
             continue;
         }
