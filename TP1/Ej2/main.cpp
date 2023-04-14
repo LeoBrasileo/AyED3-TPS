@@ -8,7 +8,6 @@ int n;
 unsigned long long int r, m;
 vector<vector<int>> cache; // <indice, acumulado>, resParcial
 //la resParcial es -1 si aun no se sabe, 0 si es false, 1 si es true
-vector<bool> respuestas;
 
 unsigned long long int calcResto(unsigned long int act, int num){
     //no puede ser negativo
@@ -52,31 +51,28 @@ bool buscarOpsAux(int indice, unsigned long long int acumulado){
 }
 
 int main() {
-    int C;
-    cin >> C;
+    int C; cin >> C;
     for(int i = 0; i < C; i++){
         cin >> n >> r >> m;
         if (r > m){
-            respuestas.push_back(false);
+            cout << "No" << endl;
             continue;
         }
-        cache = vector<vector<int>>(n, vector<int>(m, -1));
+        cache.resize(n, vector<int>(m, -1));
+        operandos.resize(n);
         for(int j = 0; j < n; j++){
-            int val;
-            cin >> val;
-            operandos.push_back(val);
+            int val; cin >> val;
+            operandos[j] = val;
         }
-        bool res = buscarOpsAux(0, 0);
-        respuestas.push_back(res);
-        operandos.clear();
-        cache.clear();
-    }
 
-    for(int i = 0; i < C; i++){
-        if (respuestas[i])
+        if(buscarOpsAux(0, 0))
             cout << "Si" << endl;
         else
             cout << "No" << endl;
+
+
+        operandos.clear();
+        cache.clear();
     }
 
     return 0;
