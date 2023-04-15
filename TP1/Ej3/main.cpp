@@ -3,65 +3,76 @@
 
 using namespace std;
 
-vector<pair<int, int>> actividades;
-vector<pair<int, int>> elegidas;
-vector<bool> usados;
-vector<int> soluciones;
-int N, maxTareas;
+// Variable global
+int N=0;
 
-bool seSolapan(pair<int, int> act1, pair<int, int> act2){
-    return act1.second > act2.first && act1.first < act2.second;
-}
+// Struct actividad para poder guardar además la posicion
+struct Actividad {
+    pair<int, int> horarios;
+    int posicion;
+    bool esNull=true;
+};
 
-bool seSolapa(pair<int, int> actividad){
-    for (int i = 0; i < elegidas.size(); i++){
-        pair<int, int> actividadAct = elegidas[i];
-        if (actividadAct == actividad)
-            continue;
-        if (seSolapan(actividad, actividadAct))
-            return true;
+
+vector<Actividad> sortDeActividades(vector<Actividad> actividades){
+    // como el rango de horas está acotado por 2N uso Counting Sort
+    
+    Actividad ordenadas[(2*N)+1];
+
+    for (int i=0; i<N; i++){
+        ordenadas[actividades[i].horarios.second] = actividades[i];
     }
-    return false;
-}
 
-
-void max_actividades(int i){
-    if (i == N){ return;}
-
-    pair<int, int> minAct = make_pair(0, 2 * N + 1);
-    int indice = -1;
-    for(int j = 0; j < N; j++){
-        //buscar valor mas chico que no este en solucion
-        if (actividades[j].second < minAct.second && !usados[j]){
-            minAct = actividades[j];
-            indice = j;
+    int i = 0;
+    for (int j=0; j<2*N; j++){
+        if (!ordenadas[j].esNull){
+            actividades[i]=ordenadas[j];
+            i++;
         }
     }
-    //agregar valor obtenido en ciclo
-    if (indice != -1 && !seSolapa(minAct)){
-        elegidas.push_back(minAct);
-        soluciones.push_back(indice + 1);
-        usados[indice] = true;
-    }
-    max_actividades(i+1);
+
+    return actividades;
 }
 
+
+vector<Actividad> maximizarActividades(vector<Actividad> actividades){
+
+    // Ordeno las actividades
+    vector<Actividad> ordenadas = sortDeActividades(actividades);
+
+    vector<Actividad> respuesta;
+    respuesta.push_back(ordenadas[0]);
+    Actividad* ultima = &respuesta.back();
+    for (int i=1; i<N; i++){
+        if (ordenadas[i].horarios.first >= ultima->horarios.second){
+            respuesta.push_back(ordenadas[i]);
+            ultima = &respuesta.back();
+        }
+    }
+
+    return respuesta;
+}
 
 
 int main() {
     cin >> N;
-    usados.resize(N, false);
-    for(int i = 0; i < N; i++){
-        int ci, ti; cin >> ci >> ti;
-        actividades.push_back(make_pair(ci, ti));
+    
+    vector<Actividad> actividades;
+    for (int i=0; i<N; i++){
+        int s, t; cin >> s >> t;
+        actividades.push_back({{s, t}, i+1, false});
     }
 
-    //calcular
-    max_actividades(0);
-    //imprimir salida
-    cout << maxTareas << endl;
-    for (int i = 0; i < soluciones.size(); i++){
-        cout << soluciones[i];
+    vector<Actividad> respuesta = maximizarActividades(actividades);
+
+    // Imprimir salida
+    int length = respuesta.size();
+    cout << length << endl;
+
+    for (int i=0; i<length; i++){
+        cout << respuesta[i].posicion << " ";
     }
+    cout << endl;
+    
     return 0;
 }
