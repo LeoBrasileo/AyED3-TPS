@@ -17,17 +17,20 @@ struct Actividad {
 vector<Actividad> sortDeActividades(vector<Actividad> actividades){
     // como el rango de horas está acotado por 2N uso Counting Sort
     
-    Actividad ordenadas[(2*N)+1];
+    vector<Actividad> ordenadas[(2*N)+1];
 
     for (int i=0; i<N; i++){
-        ordenadas[actividades[i].horarios.second] = actividades[i];
+
+        ordenadas[actividades[i].horarios.second].push_back(actividades[i]);
     }
 
     int i = 0;
-    for (int j=0; j<2*N; j++){
-        if (!ordenadas[j].esNull){
-            actividades[i]=ordenadas[j];
-            i++;
+    for (int j=0; j<(2*N)+1; j++){
+        if (ordenadas[j].size() != 0){
+            for(int k=0; k<ordenadas[j].size(); k++){
+                actividades[i]=ordenadas[j][k];
+                i++;
+            }     
         }
     }
 
@@ -70,7 +73,10 @@ int main() {
     cout << length << endl;
 
     for (int i=0; i<length; i++){
-        cout << respuesta[i].posicion << " ";
+        cout << respuesta[i].posicion;
+        if(i!=length-1){
+            cout<<" ";
+        }
     }
     cout << endl;
     
