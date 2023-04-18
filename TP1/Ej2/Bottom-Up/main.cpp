@@ -25,20 +25,21 @@ int mod_bin_exp(long long int x, long long int y, int mod) {
 }
 
 bool buscarOps(){
-    cache[0][0] = true;
+    cache[1][operandos[0]] = true;
 
     for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
+        //j representa el acumulado, pero se verifica en todas sus posibilidades
+        for (int j = 0; j <= m; j++) {
             if (!cache[i][j]) continue;
 
             long long int num = operandos[i];
-            long long int mult = j * num;
+            long long int mult = (j * (num % m)) % m;
             long long int suma = j + num;
             long long int resta = j - num;
 
             cache[i + 1][suma % m] = true;
             cache[i + 1][((resta % m) + m) % m] = true;
-            cache[i + 1][mult % m] = true;
+            cache[i + 1][mult] = true;
             cache[i + 1][mod_bin_exp(j, num, m)] = true;
         }
     }

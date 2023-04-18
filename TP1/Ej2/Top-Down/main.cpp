@@ -16,8 +16,7 @@ long long int restoResta(long long int act, long long int num){
 }
 
 long long int restoMult(long long int act, long long int num){
-    long long int mult = act * num;
-    long long int resto = ((mult % m) + m) % m;
+    long long int resto = (act * (num % m)) % m;
     return resto;
 }
 
@@ -35,7 +34,7 @@ long long int mod_bin_exp(long long int x, long long int y, int div) {
     }
 }
 
-bool buscarOpsAux(int indice, unsigned long long int acumulado){
+bool buscarOpsAux(int indice, long long int acumulado){
     if (indice == n)
         return acumulado == r;
 
@@ -45,9 +44,9 @@ bool buscarOpsAux(int indice, unsigned long long int acumulado){
     long long int num = operandos[indice];
 
     bool res = buscarOpsAux(indice + 1, (acumulado + num) % m)
-    || buscarOpsAux(indice + 1, restoResta(acumulado, num))
-    || buscarOpsAux(indice + 1, restoMult(acumulado, num))
-    || buscarOpsAux(indice + 1, mod_bin_exp(acumulado, num, m));
+               || buscarOpsAux(indice + 1, restoResta(acumulado, num))
+               || buscarOpsAux(indice + 1, restoMult(acumulado, num))
+               || buscarOpsAux(indice + 1, mod_bin_exp(acumulado, num, m));
 
     cache[indice][acumulado] = res ? 1 : 0;
     return res;
@@ -73,7 +72,7 @@ int main() {
             operandos[j] = val;
         }
 
-        if(buscarOpsAux(0, 0))
+        if(buscarOpsAux(1, operandos[0]))
             cout << "Si" << endl;
         else
             cout << "No" << endl;
