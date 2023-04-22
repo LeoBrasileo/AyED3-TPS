@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <chrono>
 
 using namespace std;
 
@@ -14,9 +16,9 @@ struct Actividad {
 int N=0;
 vector<Actividad> actividades;
 
-vector<Actividad> sortDeActividades(vector<Actividad> actividades){
+void sortDeActividades(){
     // como el rango de horas está acotado por 2N uso Counting Sort
-
+    
     vector<Actividad> ordenadas[(2*N)+1];
 
     for (int i=0; i<N; i++){
@@ -29,25 +31,23 @@ vector<Actividad> sortDeActividades(vector<Actividad> actividades){
             for(int k = 0; k < ordenadas[j].size(); k++){
                 actividades[i] = ordenadas[j][k];
                 i++;
-            }
+            }     
         }
     }
-
-    return actividades;
 }
 
 
 vector<Actividad> maximizarActividades(){
 
     // Ordeno las actividades
-    vector<Actividad> ordenadas = sortDeActividades(actividades);
+    sortDeActividades();
 
     vector<Actividad> respuesta;
-    respuesta.push_back(ordenadas[0]);
+    respuesta.push_back(actividades[0]);
     Actividad* ultima = &respuesta.back();
     for (int i=1; i<N; i++){
-        if (ordenadas[i].inicio >= ultima->final){
-            respuesta.push_back(ordenadas[i]);
+        if (actividades[i].inicio >= ultima->final){
+            respuesta.push_back(actividades[i]);
             ultima = &respuesta.back();
         }
     }
@@ -57,8 +57,13 @@ vector<Actividad> maximizarActividades(){
 
 
 int main() {
-    cin >> N;
+    int repeat = 10;
+    double counter = 0;
+    ofstream output_file; output_file.open("runtime.csv", ios::app);
+    //output_file << "n,time\n";
 
+    cin >> N;
+    
     actividades.resize(N);
     for (int i=0; i<N; i++){
         int s, t; cin >> s >> t;
@@ -67,19 +72,16 @@ int main() {
         actividades[i].posicion = i+1;
     }
 
-    vector<Actividad> respuesta = maximizarActividades();
-
-    // Imprimir salida
-    int length = respuesta.size();
-    cout << length << endl;
-
-    for (int i=0; i<length; i++){
-        cout << respuesta[i].posicion;
-        if(i!=length-1){
-            cout<<" ";
-        }
+    for (int ignore=0; ignore<repeat; ignore++){
+        auto start = chrono::high_resolution_clock::now();
+        vector<Actividad> respuesta = maximizarActividades();
+        auto stop = chrono::high_resolution_clock::now();
+        chrono::duration<double> diff = stop - start;
+        counter += diff.count();
     }
-    cout << endl;
+    
 
+    output_file << N << "," << counter / repeat << "\n";
+    
     return 0;
 }
