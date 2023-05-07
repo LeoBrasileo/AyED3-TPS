@@ -1,5 +1,5 @@
 CC = g++
-CPPFLAGS = -g -std=c++11 -Wall -O3
+CPPFLAGS = -g -std=c++11 -Wall -O0
 OUTPUT_PATH := bin
 
 .PHONY: all clean
