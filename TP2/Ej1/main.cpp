@@ -50,19 +50,22 @@ int cubren(int v, int p = -1) {
 double calcularJugadas() {
     int totales = N * (N - 1) / 2;
 
+    //codigo dfs y busqueda de puentes robado de clase 8
+    //clase recorridos (BFS y DFS)
     int componentes = 0;
-    for (int i = 1; i < N; i++) {
+    for (int i = 1; i <= N; i++) {
         if (estado[i] == NO_LO_VI) {
             dfs(i);
             componentes++;
         }
     }
     int puentes = 0;
-    for (int i = 1; i < N; i++) {
+    for (int i = 1; i <= N; i++) {
         if (cubren(i) == 0) {
             puentes++;
         }
     }
+    puentes -= componentes;
 
     return 1 / (double) totales;
 }
