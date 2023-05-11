@@ -4,101 +4,81 @@
 
 using namespace std;
 
+enum NODO_ESTADO {
+    NO_LO_VI = -1, EMPECE_A_VER = 0, TERMINE_DE_VER = 1
+};
+
 int N, M;
 //g es la representacion del grafo
 //se piensa como map de vertices a vertices vecinos, espacio: O(N^2)
 vector<vector<int>> g;
-vector<bool> visitado;
-vector<vector<int>> caminos; //cada camino es una lista de vertices
+vector<int> estado;
+vector<vector<int>> treeEdges;
+vector<int> backConExtremoInferiorEn;
+vector<int> backConExtremoSuperiorEn;
+vector<int> memo;
 
-void dfsCaminosAux(int v, int w, vector<int> camino){
-    visitado[v] = true;
+void dfs(int v, int padre = -1) {
+    estado[v] = EMPECE_A_VER;
 
-    if (v == w){ //cierro camino
-        camino.pop_back();
-        caminos.push_back(camino);
-    } else{
-        // basicamente un DFS
-        for (int u : g[v]){
-            if (!visitado[u]){
-                camino.push_back(u);
-                dfsCaminosAux(u, w, camino);
-                camino.pop_back();
-            }
+    for (int u: g[v]) {
+        if (estado[u] == NO_LO_VI) {
+            treeEdges[v].push_back(u);
+            dfs(u, v);
+        } else if (u != padre) {
+            backConExtremoInferiorEn[v]++;
+            backConExtremoSuperiorEn[u]++;
         }
     }
 
-    visitado[v] = false;
+    estado[v] = TERMINE_DE_VER;
 }
 
-void dfsCaminos(int v, int w){
-    //devolvemos la lista de vertices que forman un camino entre v y w
-    //obs: no se devuelven v y w como parte del camino, solo los vertices internos
-    dfsCaminosAux(v, w, vector<int>(0));
-}
-bool hasRepeatedNumber(const vector<vector<int>>& vecs) {
-    if (vecs.empty())
-        return false;
-
-    for (int i = 0; i < vecs[0].size(); i++) {
-        int num = vecs[0][i];
-
-        bool found = true;
-        for (int j = 1; j < vecs.size(); j++) {
-            bool curFound = false;
-            for (int k = 0; k < vecs[j].size(); k++) {
-                if (vecs[j][k] == num) {
-                    curFound = true;
-                    break;
-                }
-            }
-            if (!curFound) {
-                found = false;
-                break;
-            }
+int cubren(int v, int p = -1) {
+    if (memo[v] != -1) return memo[v];
+    int res = 0;
+    res += backConExtremoInferiorEn[v];
+    res -= backConExtremoSuperiorEn[v];
+    for (int hijo: treeEdges[v])
+        if (hijo != p) {
+            res += cubren(hijo, v);
         }
-        if (found) {
-            return true;
+    memo[v] = res;
+    return res;
+}
+
+double calcularJugadas() {
+    int totales = N * (N - 1) / 2;
+
+    int componentes = 0;
+    for (int i = 1; i < N; i++) {
+        if (estado[i] == NO_LO_VI) {
+            dfs(i);
+            componentes++;
+        }
+    }
+    int puentes = 0;
+    for (int i = 1; i < N; i++) {
+        if (cubren(i) == 0) {
+            puentes++;
         }
     }
 
-    return false;
-}
-
-
-double calcularJugadas(){
-    int perdidas = 0;
-    int totales = 0;
-    //cada posible jugada
-    for (int i = 1; i <= N; i++){
-        for (int j = i+1; j <= N; j++){
-            totales++;
-            dfsCaminos(i, j);
-
-            if (caminos.size() <= 1){
-                perdidas++;
-                caminos.clear();
-                continue;
-            }
-
-            if (hasRepeatedNumber(caminos)){
-                perdidas++;
-            }
-
-            caminos.clear();
-        }
-    }
-
-    return perdidas / (double)totales;
+    return 1 / (double) totales;
 }
 
 int main() {
     cin >> N >> M;
-    g.resize(N+1, vector<int>(0, -1));
-    visitado.resize(N+1, false);
+    backConExtremoInferiorEn.resize(N + 1, 0);
+    backConExtremoSuperiorEn.resize(N + 1, 0);
+    g.resize(N + 1, vector<int>(0));
+    estado.resize(N + 1, NO_LO_VI);
+    memo.resize(N + 1, -1);
+    treeEdges.resize(N + 1, vector<int>(0));
 
     for (int i = 0; i < M; i++) {
-        int u, v; cin >> u >> v;
+        int u, v;
+        cin >> u >> v;
         g[u].push_back(v);
         g[v].push_back(u);
     }
