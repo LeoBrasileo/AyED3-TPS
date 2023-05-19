@@ -7,7 +7,7 @@ using namespace std;
 
 typedef pair<int, int> arista;
 
-int N, M;
+long long N, M;
 //g es la representacion del grafo
 //se piensa como listas de adyacencias por cada vertice, espacio: O(N + M)
 vector<arista> puentes;
@@ -35,6 +35,17 @@ void dfsPuentes(int v, int padre = -1) {
     }
 }
 
+void buscarPuentes() {
+    timer = 0;
+    visitados.assign(N+1, false);
+    tin.assign(N+1, -1);
+    low.assign(N+1, -1);
+    for (int i = 0; i < N; ++i) {
+        if (!visitados[i])
+            dfsPuentes(i);
+    }
+}
+
 void dfsComponentes(int v, int &tamComponente){
     visitados[v] = true;
     tamComponente++;
@@ -46,7 +57,7 @@ void dfsComponentes(int v, int &tamComponente){
 }
 
 void calcVerticesxComponente(vector<int> &verticesPorComponente){
-    visitados.assign(N, false);
+    visitados.assign(N+1, false);
 
     for(int i = 1; i < N; i++){
         if(!visitados[i]){
@@ -57,27 +68,16 @@ void calcVerticesxComponente(vector<int> &verticesPorComponente){
     }
 }
 
-void buscarPuentes() {
-    timer = 0;
-    visitados.assign(N, false);
-    tin.assign(N, -1);
-    low.assign(N, -1);
-    for (int i = 0; i < N; ++i) {
-        if (!visitados[i])
-            dfsPuentes(i);
-    }
-}
-
-int calcularJugadasGanadas() {
+double probaGanar() {
     //codigo dfsPuentes y busqueda de puentes de https://cp-algorithms.com/graph/bridge-searching.html#implementation
     //tambien se usa conocimiento de clase recorridos (BFS y DFS)
     buscarPuentes();
 
     //eliminar puentes del grafo original,
     //me quedo con un grafo en el que se que Tuki gana si elige 2 vertices de la misma componente
-    for (int i = 0; i < puentes.size(); i++){
-        int u = puentes[i].first;
-        int v = puentes[i].second;
+    for (arista puente : puentes){
+        int u = puente.first;
+        int v = puente.second;
         g[u].erase(find(g[u].begin(), g[u].end(), v));
         g[v].erase(find(g[v].begin(), g[v].end(), u));
     }
@@ -88,23 +88,18 @@ int calcularJugadasGanadas() {
 
     //ganadas = sumatoria de (Vi * (Vi - 1) / 2) de i = 1 a #componentes
     //donde Vi es la cantidad de vertices en la componente i
-    int ganadas = 0;
-    for(int i = 0; i < verticesPorComponente.size(); i++){
-        int vi = verticesPorComponente[i];
-        ganadas += vi * (vi - 1) / 2;
+    long long jugadasGanadas = 0;
+    for(int vi : verticesPorComponente){
+        jugadasGanadas += vi * (vi - 1) / 2;
     }
+    long long jugadasTotales = N * (N - 1) / 2;
 
-    return ganadas;
-}
-
-double probaPerder(int jugadasGanadas){
-    int jugadasTotales = N * (N - 1) / 2;
-
-    return 1 - (double)jugadasGanadas / jugadasTotales;
+    return (double)jugadasGanadas / (double)jugadasTotales;
 }
 
 int main() {
     cin >> N >> M;
+
     g.resize(N + 1, vector<int>(0));
 
     for (int i = 0; i < M; i++) {
@@ -114,8 +109,8 @@ int main() {
         g[v].push_back(u);
     }
 
-    int ganadas = calcularJugadasGanadas();
-    double res = probaPerder(ganadas);
+    double ganar = probaGanar();
+    double res = 1.0 - ganar;
 
     cout << fixed;
     cout << setprecision(5) << res;
