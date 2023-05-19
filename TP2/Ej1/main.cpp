@@ -89,7 +89,7 @@ double probaGanar() {
     //ganadas = sumatoria de (Vi * (Vi - 1) / 2) de i = 1 a #componentes
     //donde Vi es la cantidad de vertices en la componente i
     long long jugadasGanadas = 0;
-    for(int vi : verticesPorComponente){
+    for(long long vi : verticesPorComponente){
         if (vi > 1)
             jugadasGanadas += (vi * (vi - 1)) / 2;
     }
