@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include <vector>
 
 using namespace std;
@@ -15,10 +16,16 @@ vector<bool> fue_tirada;
 
 // Estos son sólo para hacer Kosaraju
 vector<int> componente, orden;
-vector<bool> usados;
+vector<bool> visitados;
 
 // Vector con los resultados
 vector<int> res;
+
+/*idea:
+1- buscar vertices con grado de entrada 1 y tirarlos con DFS
+2- buscar componentes fuertemente conexas (Kosaraju)
+3- por cada ciclo encontrado, es decir cada comp fuertemente conexa, tirar las fichas con menor num de vertice
+ */
 
 void tirar_fichas(int v){
     fue_tirada[v] = true;
@@ -29,11 +36,10 @@ void tirar_fichas(int v){
     }
 }
 
-
 void dfs1(int v){
-    usados[v] = true;
+    visitados[v] = true;
     for(int u : g[v]){
-        if(usados[u]){
+        if(!visitados[u]){
             dfs1(u);
         }
     }
@@ -41,54 +47,89 @@ void dfs1(int v){
 }
 
 void dfs2(int v){
-    usados[v]=true;
+    visitados[v]=true;
     componente.push_back(v);
     for (int u : g_t[v]){
-        if (!usados[u]){
+        if (!visitados[u]){
             dfs2(u);
         }
     }
 }
 
-
 void kosaraju(){
-    usados.resize(N+1, false);
-    for (int i =1; i<N+1; i++){
-        if (!fue_tirada[i] && !usados[i]){
+    visitados = vector<bool>(N + 1, false);
+    for (int i = 1; i <= N; i++){
+        if (!fue_tirada[i] && !visitados[i]){
             dfs1(i);
         }
     }
+
     reverse(orden.begin(), orden.end());
-    usados.resize(N+1, false);
+    visitados = vector<bool>(N + 1, false);
 
-    for (int v :orden){
-        if(!usados[v]){
+    //cosas para condensar
+    vector<int> raices(N+1, 0);
+    vector<int> raices_nodos;
+    vector<bool> tiene_in_condensado(N+1, false);
+    vector<vector<int>> condensado(N+1); //el grafo condensado jejox
+
+    for (int v : orden){
+        if(!visitados[v]){
             dfs2(v);
-        
-        // Acá tengo la componente
 
-        res.push_back(min(componente));
+            //condensar
+            //cuando se condensa ya se hace lexicograficamente
+            int root = componente.front();
+            for (auto u : componente)
+                raices[u] = root;
+            raices_nodos.push_back(root);
 
-        componente.clear();
-        
+            componente.clear();
+        }
+    }
+
+    //armado de grafo condensado
+    for (int v = 1; v <= N; v++){
+        for (auto u : g[v]) {
+            int raiz_v = raices[v];
+            int raiz_u = raices[u];
+
+            if (raiz_u != raiz_v){
+                condensado[raiz_v].push_back(raiz_u);
+                tiene_in_condensado[raiz_u] = true;
+            }
+        }
+    }
+
+    //tiramos las fichas con grado de entrada 0 en el grafo de kosaraju
+    //por como esta armado el grafo condensado, siempre agarramos el vertice minimo
+    for (int raiz : raices_nodos){
+        if(!tiene_in_condensado[raiz]){
+            res.push_back(raiz);
+            tirar_fichas(raiz);
         }
     }
 }
 
+void jugar(){
+    // Tiro todas las que tienen grado de entrada 0
+    for (int i = 1; i <= N; i++){
+        if(!tiene_in[i]){
+            res.push_back(i);
+            tirar_fichas(i);
+        }
+    }
 
-
-/*idea:
-1- buscar vertices con grado de entrada 1 y tirarlos con DFS
-2- buscar componentes fuertemente conexas (Kosaraju)
-3- por cada ciclo encontrado, es decir cada comp fuertemente conexa, tirar las fichas con menor num de vertice
- */
+    //en este punto, todas las que quedan son fichas en componentes fuertemente conexas
+    //kosaraju de https://cp-algorithms.com/graph/strongly-connected-components.html
+    kosaraju();
+}
 
 int main() {
     cin >> N >> M;
 
-    tiene_in.assign(N+1, false);
-    fue_tirada.assign(N+1, false);
-    cant_en_pie = N;
+    tiene_in.assign(N + 1, false);
+    fue_tirada.assign(N + 1, false);
 
     g.resize(N + 1, vector<int>(0));
     g_t.resize(N + 1, vector<int>(0));
@@ -101,21 +142,13 @@ int main() {
         g_t[v].push_back(u);
     }
 
-    // Tiro todas las que tienen grado de entrada 0
-    for (int i =1; i<N+1; i++){
-        if(!tiene_in[i]){
-            res.push_back(i);
-            tirar_fichas(i);
-        }
+    jugar();
+
+    cout << res.size() << endl;
+    sort(res.begin(), res.end());
+    for(int i : res){
+        cout << i << " ";
     }
-
-    // Tenemos: Nodos tirados -> no nos importa hacer nada mas con ellos. 
-
-    // A partir de acá sólo queda al menos una comp conexa con ciclo.
-
-    kosaraju();
-
-    res.sort();
 
     return 0;
 }
