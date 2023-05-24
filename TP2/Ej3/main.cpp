@@ -7,8 +7,8 @@ using ll = long long;
 const ll inf = 1e18;
 
 int N, R, W, U, V;
-vector<tuple<ll,int,int>> E;
-vector<vector<int>> g;
+vector<tuple<double,int,int>> E;
+vector<vector<pair<int, double>>> g;
 
 struct DSU{
     DSU(int n){
@@ -31,6 +31,7 @@ struct DSU{
 };
 
 void kruskal(){
+
     sort(E.begin(),E.end());
     ll res = 0;
     int aristas = 0;
@@ -41,8 +42,8 @@ void kruskal(){
             // agregar
             dsu.unite(u,v);
             aristas++;
-            g[u].push_back(v);
-            g[v].push_back(u);
+            g[u].push_back({v,c});
+            g[v].push_back({u,c});
             res += c;
         }
     }
@@ -61,7 +62,7 @@ int main() {
     cin >> C;
     while (C--){
         cin >> N >> R >> W >> U >> V;
-        g = vector<vector<int>>(N);
+        g = vector<vector<pair<int, double>>>(N);
         vector<arista> aristas;
         for(int i = 0; i < N; i++){
             int x, y;
@@ -72,10 +73,14 @@ int main() {
         //armado de aristas con pesos
         for(int i = 0; i < N; i++){
             for(int j = i+1; j < N; j++){
-                double dist = distancia(aristas[i].first,aristas[i].second,aristas[j].first,aristas[j].second);
-                E.push_back({dist,i,j});
+                arista a = aristas[i];
+                arista b = aristas[j];
+                double costo = distancia(a.first,a.second,b.first,b.second);
+                costo = costo <= R ? costo * U : costo * V; //si es menor a R, uso UTP, sino fibra optica
+                E.push_back({costo,i,j});
             }
         }
+
         kruskal();
 
         //limpiar para prox test
