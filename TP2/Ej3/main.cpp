@@ -7,7 +7,8 @@ using ll = long long;
 const ll inf = 1e18;
 
 int N, R, W, U, V;
-vector<tuple<double,int,int>> E;
+double costoUtp = 0, costoFibra = 0;
+vector<tuple<double,int,int,bool>> E, AGM;
 vector<vector<pair<int, double>>> g;
 
 struct DSU{
@@ -31,24 +32,29 @@ struct DSU{
 };
 
 void kruskal(){
-
+    //basado en implementacion vista en clase
     sort(E.begin(),E.end());
-    ll res = 0;
     int aristas = 0;
     DSU dsu(N);
-    for(auto [c,u,v] : E){
+    for(auto [c,u,v,utp] : E){
         //si (u,v) es arista segura
         if(dsu.find(u) != dsu.find(v)){
-            // agregar
             dsu.unite(u,v);
             aristas++;
-            g[u].push_back({v,c});
-            g[v].push_back({u,c});
-            res += c;
+            AGM.push_back({c,u,v,utp});
         }
     }
-    if(aristas == N-1) cout<<res<<endl;
-    else cout<<"IMPOSSIBLE\n";
+    if(aristas == N-1) {
+        //saco las W-1 aristas mas pesadas
+        for (int i = 0; i < W-1; i++){
+            AGM.pop_back();
+        }
+
+        for(auto [c,u,v,utp] : AGM){
+            if (utp) costoUtp += c;
+            else costoFibra += c;
+        }
+    }
 }
 
 double distancia(int v1, int u1, int v2, int u2){
@@ -60,7 +66,7 @@ double distancia(int v1, int u1, int v2, int u2){
 int main() {
     int C;
     cin >> C;
-    while (C--){
+    for (int i = 1; i <= C; i++) {
         cin >> N >> R >> W >> U >> V;
         g = vector<vector<pair<int, double>>>(N);
         vector<arista> aristas;
@@ -76,14 +82,19 @@ int main() {
                 arista a = aristas[i];
                 arista b = aristas[j];
                 double costo = distancia(a.first,a.second,b.first,b.second);
+                bool utp = costo <= R;
                 costo = costo <= R ? costo * U : costo * V; //si es menor a R, uso UTP, sino fibra optica
-                E.push_back({costo,i,j});
+                E.push_back({costo,i,j, utp});
             }
         }
 
         kruskal();
 
+        cout << "Caso #" << i << ": " << fixed << setprecision(3) << costoUtp << " " << costoFibra << "\n";
+
         //limpiar para prox test
+        costoFibra = costoUtp = 0;
+        AGM.clear();
         E.clear();
         g.clear();
     }
