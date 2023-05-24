@@ -70,21 +70,21 @@ int main() {
         cin >> N >> R >> W >> U >> V;
         g = vector<vector<pair<int, double>>>(N);
         vector<arista> aristas;
-        for(int i = 0; i < N; i++){
+        for(int j = 0; j < N; j++){
             int x, y;
             cin >> x >> y;
             aristas.push_back({x,y});
         }
 
         //armado de aristas con pesos
-        for(int i = 0; i < N; i++){
-            for(int j = i+1; j < N; j++){
-                arista a = aristas[i];
+        for(int ii = 0; ii < N; ii++){
+            for(int j = ii+1; j < N; j++){
+                arista a = aristas[ii];
                 arista b = aristas[j];
                 double costo = distancia(a.first,a.second,b.first,b.second);
                 bool utp = costo <= R;
                 costo = costo <= R ? costo * U : costo * V; //si es menor a R, uso UTP, sino fibra optica
-                E.push_back({costo,i,j, utp});
+                E.push_back({costo,ii,j, utp});
             }
         }
 
