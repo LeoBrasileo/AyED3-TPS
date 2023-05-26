@@ -2,7 +2,7 @@
 
 using namespace std;
 
-typedef pair<int, int> arista;
+typedef pair<int, int> oficina;
 
 int N, R, W, U, V;
 double costoUtp = 0, costoFibra = 0;
@@ -65,18 +65,18 @@ int main() {
     cin >> C;
     for (int i = 1; i <= C; i++) {
         cin >> N >> R >> W >> U >> V;
-        vector<arista> aristas;
+        vector<oficina> oficinas;
         for (int j = 0; j < N; j++) {
             int x, y;
             cin >> x >> y;
-            aristas.push_back({x, y});
+            oficinas.push_back({x, y});
         }
 
         //armado de aristas con pesos
         for (int ii = 0; ii < N; ii++) {
             for (int j = ii + 1; j < N; j++) {
-                arista a = aristas[ii];
-                arista b = aristas[j];
+                oficina a = oficinas[ii];
+                oficina b = oficinas[j];
                 double costo = distancia(a.first, a.second, b.first, b.second);
                 bool utp = costo <= R;
                 costo = utp ? costo * U : costo * V;
