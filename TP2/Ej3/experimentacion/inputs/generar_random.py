@@ -20,28 +20,39 @@ while (int(R) > 10000):
 
 file = open(f"{in_txt}.txt", "w")
 
-file.write("4950\n")
+C = input("Cuantos casos de test queres?\n")
+
+file.write(f"{C}\n")
 
 
 def generar_pares_unicos(n):
     pares = []
 
     while len(pares) < n:
-        num1 = random.randint(0, 10000)
-        num2 = random.randint(0, 10000)
+        num1 = random.randint(0, n * 10)
+        num2 = random.randint(0, n * 10)
 
         if [num1, num2] not in pares and [num2, num1] not in pares:
             pares.append([num1, num2])
             file.write(f"{num1} {num2}\n")
 
 
-n = 0
+def generar_test(n, w):
+    line = f"{n} {R} {w} {U} {V}\n"
+    file.write(line)
+    generar_pares_unicos(n)
+    
 
-while n < 1000:
-    w = 0
-    while w < n:
-        line = f"{n} {R} {w} {U} {V}\n"
-        file.write(line)
-        generar_pares_unicos(n)
-        w += 10
-    n += 10
+for i in range(int(C)):
+    n = random.randint(0, 1000)
+    w = random.randint(0, n)
+    generar_test(n, w)
+
+# while n < 1000:
+#     w = 0
+#     while w < n:
+#         line = f"{n} {R} {w} {U} {V}\n"
+#         file.write(line)
+#         generar_pares_unicos(n)
+#         w += 10
+#     n += 10
