@@ -1,9 +1,8 @@
 #include <bits/stdc++.h>
-#include <chrono>
 
 using namespace std;
 
-typedef pair<int, int> arista;
+typedef pair<int, int> oficina;
 
 int N, R, W, U, V;
 double costoUtp = 0, costoFibra = 0;
@@ -36,22 +35,20 @@ void kruskal() {
     //basado en implementacion vista en clase
     sort(E.begin(), E.end());
     DSU dsu(N);
+    int componentes = N;
     for (auto [c, u, v, utp]: E) {
+        if (componentes == W) break;
         //si (u,v) es arista segura
         if (dsu.find(u) != dsu.find(v)) {
             dsu.unite(u, v);
             AGM.push_back({c, u, v, utp});
+            componentes--;
         }
     }
-    if (AGM.size() == N - 1) {
-        //saco las W-1 aristas mas pesadas
-        for (int i = 0; i < W - 1; i++)
-            AGM.pop_back();
 
-        for (auto [c, u, v, utp]: AGM) {
-            if (utp) costoUtp += c;
-            else costoFibra += c;
-        }
+    for (auto [c, u, v, utp]: AGM) {
+        if (utp) costoUtp += c;
+        else costoFibra += c;
     }
 }
 
@@ -66,18 +63,18 @@ int main() {
     cin >> C;
     for (int i = 1; i <= C; i++) {
         cin >> N >> R >> W >> U >> V;
-        vector<arista> aristas;
+        vector<oficina> oficinas;
         for (int j = 0; j < N; j++) {
             int x, y;
             cin >> x >> y;
-            aristas.push_back({x, y});
+            oficinas.push_back({x, y});
         }
 
         //armado de aristas con pesos
         for (int ii = 0; ii < N; ii++) {
             for (int j = ii + 1; j < N; j++) {
-                arista a = aristas[ii];
-                arista b = aristas[j];
+                oficina a = oficinas[ii];
+                oficina b = oficinas[j];
                 double costo = distancia(a.first, a.second, b.first, b.second);
                 bool utp = costo <= R;
                 costo = utp ? costo * U : costo * V;
@@ -87,24 +84,13 @@ int main() {
 
         kruskal();
 
+        cout << "Caso #" << i << ": " << fixed << setprecision(3) << costoUtp << " " << costoFibra << "\n";
+
         //limpiar para prox test
         costoFibra = costoUtp = 0;
         AGM.clear();
         E.clear();
-
-    for (int ignore=0; ignore<repeat; ignore++){
-    auto start = chrono::high_resolution_clock::now();
-    vector<Actividad> respuesta = kruskal();
-    auto stop = chrono::high_resolution_clock::now();
-    chrono::duration<double> diff = stop - start;
-    counter += diff.count();
     }
-    
-
-    output_file << N << W << "," << counter / repeat << "\n";
-    
-    }
-
 
     return 0;
 }
