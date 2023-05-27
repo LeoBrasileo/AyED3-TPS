@@ -35,22 +35,20 @@ void kruskal() {
     //basado en implementacion vista en clase
     sort(E.begin(), E.end());
     DSU dsu(N);
+    int componentes = N;
     for (auto [c, u, v, utp]: E) {
+        if (componentes == W) break;
         //si (u,v) es arista segura
         if (dsu.find(u) != dsu.find(v)) {
             dsu.unite(u, v);
             AGM.push_back({c, u, v, utp});
+            componentes--;
         }
     }
-    if (AGM.size() == N - 1) {
-        //saco las W-1 aristas mas pesadas
-        for (int i = 0; i < W - 1; i++)
-            AGM.pop_back();
 
-        for (auto [c, u, v, utp]: AGM) {
-            if (utp) costoUtp += c;
-            else costoFibra += c;
-        }
+    for (auto [c, u, v, utp]: AGM) {
+        if (utp) costoUtp += c;
+        else costoFibra += c;
     }
 }
 
