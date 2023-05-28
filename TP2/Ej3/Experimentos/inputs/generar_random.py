@@ -49,7 +49,7 @@ for i in range(int(C)):
     # no repetimos numeros
     while (n in elegidos):
         n = random.randint(0, 1000)
-    w = random.randint(0, n)
+    w = random.randint(0, n-1)
     #w = n-1
     elegidos.append(n)
     generar_test(n, w)
