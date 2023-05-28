@@ -7,7 +7,7 @@ typedef pair<int, int> oficina;
 int N, R, W, U, V;
 double costoUtp = 0, costoFibra = 0;
 //g es matriz de adyacencias, indicado por pesos
-vector<vector<double>> g;
+vector<vector<double>> g, original;
 
 vector<double> costos;
 
@@ -86,6 +86,7 @@ double medirTiempo() {
         //para prox test
         costoUtp = costoFibra = 0;
         costos.resize(N, INFINITY);
+        g = original;
 
         auto stop = chrono::high_resolution_clock::now();
         chrono::duration<double> diff = stop - start;
@@ -96,12 +97,13 @@ double medirTiempo() {
 }
 
 int main() {
-    output_file.open("runtime_dense.csv", ios::app);
+    output_file.open("runtime_denso.csv", ios::app);
     int C;
     cin >> C;
     for (int i = 1; i <= C; i++) {
         cin >> N >> R >> W >> U >> V;
         g.resize(N, vector<double>(N, INFINITY));
+        original.resize(N, vector<double>(N, INFINITY));
         costos.resize(N, INFINITY);
         vector<oficina> oficinas;
         for (int j = 0; j < N; j++) {
@@ -119,6 +121,7 @@ int main() {
                 bool utp = costo <= R;
                 costo = utp ? costo * U : costo * V;
                 g[ii][j] = g[j][ii] = costo;
+                original[ii][j] = original[j][ii] = costo;
             }
         }
 
@@ -129,6 +132,7 @@ int main() {
         //limpiar para prox test
         g.clear();
         costos.clear();
+        original.clear();
     }
 
     return 0;

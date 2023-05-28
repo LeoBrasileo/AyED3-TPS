@@ -42,10 +42,16 @@ def generar_test(n, w):
     file.write(line)
     generar_pares_unicos(n)
     
+elegidos = []
 
 for i in range(int(C)):
     n = random.randint(0, 1000)
+    # no repetimos numeros
+    while (n in elegidos):
+        n = random.randint(0, 1000)
     w = random.randint(0, n)
+    #w = n-1
+    elegidos.append(n)
     generar_test(n, w)
 
 # while n < 1000:

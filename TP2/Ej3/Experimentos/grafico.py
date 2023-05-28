@@ -19,7 +19,7 @@ ax.plot(df1['n'], df1['time_algo_denso'], color='red', label='Algoritmo Denso')
 ax.plot(df2['n'], df2['time_algo_ralo'], color='blue', label='Algoritmo Ralo')
 
 # Configurar etiquetas de los ejes
-plt.xlabel("N")
+plt.xlabel("Tamaño de muestra")
 plt.ylabel("Tiempo de Ejecución")
 
 # Mostrar leyenda
