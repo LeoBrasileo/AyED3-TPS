@@ -12,11 +12,10 @@ typedef pair<int, int> aristaSimple; //peso | nodo
 
 long long N, M, inf = LLONG_MAX;
 
-vector<vector<aristaSimple>> grafo;
+vector<vector<aristaSimple>> grafo, reves;
 vector<arista> nuevas;
-vector<vector<int>> ady; //lista de adyacencias
 
-vector<long long> dijkstra(int s){
+vector<long long> dijkstra(vector<vector<aristaSimple>> g, int s){
     vector<long long> distancias;
     vector<bool> visitados = vector<bool>(N+1, false);
     distancias.resize(N+1, inf);
@@ -36,7 +35,7 @@ vector<long long> dijkstra(int s){
 
         visitados[u] = true;
 
-        for (auto [w, v] : grafo[u]){
+        for (auto [w, v] : g[u]){
             //relajacion
             if(distancias[u] != inf && distancias[v] > distancias[u] + w){
                 distancias[v] = distancias[u] + w;
@@ -49,13 +48,13 @@ vector<long long> dijkstra(int s){
 }
 
 long long costoOptimizado(int s, int t){
-    vector<long long> ds = dijkstra(s);
+    vector<long long> ds = dijkstra(grafo, s);
+    vector<long long> dt = dijkstra(reves, t);
     int dist = ds[t];
 
     for (auto [qj, uj, vj] : nuevas){
-        vector<long long> dv = dijkstra(vj);
-        if (ds[uj] + qj + dv[t] < dist)
-            dist = ds[uj] + qj + dv[t];
+        if (ds[uj] + qj + dt[vj] < dist)
+            dist = ds[uj] + qj + dt[vj];
     }
 
     return dist;
@@ -67,13 +66,13 @@ int main() {
 
     while (C--){
         cin >> N >> M >> k >> s >> t;
-        ady.resize(N+1);
+        reves.resize(N+1);
         grafo.resize(N+1);
         for (int i = 0; i < M; i++){
             int d, c, l;
             cin >> d >> c >> l;
             grafo[d].push_back({l, c});
-            ady[d].push_back(c);
+            reves[c].push_back({l, d});
         }
 
         for (int i = 0; i < k; i++){
@@ -85,8 +84,7 @@ int main() {
         long long res = costoOptimizado(s, t);
         cout << res << endl;
 
-        //complejidad final: O(k(N+M)logN)
-        //tomando k acotado < 300, seria O((N+M)logN)
+        //complejidad final: O((N+M)logN)
     }
 
     return 0;
