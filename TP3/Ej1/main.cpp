@@ -1,31 +1,26 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <queue>
-#include <limits.h>
-#include <tuple>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-typedef tuple<int, int, int> arista; //peso | nodo1 | nodo2
-typedef pair<int, int> aristaSimple; //peso | nodo
+typedef tuple<long long, long long, long long> arista; //peso | nodo1 | nodo2
+typedef pair<long long, long long> arista_simple; //peso | nodo
 
 long long N, M, inf = LLONG_MAX;
 
-vector<vector<aristaSimple>> grafo, reves;
+vector<vector<arista_simple>> grafo, reves;
 vector<arista> nuevas;
 
-vector<long long> dijkstra(vector<vector<aristaSimple>> g, int s){
+vector<long long> dijkstra(vector<vector<arista_simple>> g, long long s){
     vector<long long> distancias;
     vector<bool> visitados = vector<bool>(N+1, false);
     distancias.resize(N+1, inf);
     distancias[s] = 0;
 
-    priority_queue<aristaSimple, vector<aristaSimple>, greater<aristaSimple>> min_heap;
+    priority_queue<arista_simple, vector<arista_simple>, greater<arista_simple>> min_heap;
     min_heap.push({0, s});
 
     while (!min_heap.empty()){
-        int dist, u;
+        long long dist, u;
         tie(dist, u) = min_heap.top();
         min_heap.pop();
 
@@ -47,42 +42,47 @@ vector<long long> dijkstra(vector<vector<aristaSimple>> g, int s){
     return distancias;
 }
 
-long long costoOptimizado(int s, int t){
+long long costoOptimizado(long long s, long long t){
     vector<long long> ds = dijkstra(grafo, s);
     vector<long long> dt = dijkstra(reves, t);
-    int dist = ds[t];
+    long long dist = ds[t];
 
     for (auto [qj, uj, vj] : nuevas){
-        if (ds[uj] + qj + dt[vj] < dist)
+        if (ds[uj] != inf && dt[vj] != inf && ds[uj] + qj + dt[vj] < dist)
             dist = ds[uj] + qj + dt[vj];
     }
 
+    if (dist == inf) dist = -1; //en caso de que no exista camino devolvemos -1
     return dist;
 }
 
 int main() {
-    int C, k, s, t;
+    long long C, k, s, t;
     cin >> C;
 
     while (C--){
         cin >> N >> M >> k >> s >> t;
         reves.resize(N+1);
         grafo.resize(N+1);
-        for (int i = 0; i < M; i++){
-            int d, c, l;
+        for (long long i = 0; i < M; i++){
+            long long d, c, l;
             cin >> d >> c >> l;
             grafo[d].push_back({l, c});
             reves[c].push_back({l, d});
         }
 
-        for (int i = 0; i < k; i++){
-            int uj, vj, qj;
+        for (long long i = 0; i < k; i++){
+            long long uj, vj, qj;
             cin >> uj >> vj >> qj;
             nuevas.push_back({qj, uj, vj});
         }
 
         long long res = costoOptimizado(s, t);
         cout << res << endl;
+
+        reves.clear();
+        grafo.clear();
+        nuevas.clear();
 
         //complejidad final: O((N+M)logN)
     }
