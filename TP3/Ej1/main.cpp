@@ -1,34 +1,35 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <tuple>
+#include <vector>
+#include <functional>
+#include <queue>
 
 using namespace std;
 
-typedef tuple<long long, long long, long long> arista; //peso | nodo1 | nodo2
-typedef pair<long long, long long> arista_simple; //peso | nodo
+typedef tuple<int, int, int> arista; //peso | nodo1 | nodo2
+typedef pair<int, int> arista_simple; //peso | nodo
 
-long long N, M, inf = LLONG_MAX;
+int N, M, inf = 0x3f3f3f3f;
 
 vector<vector<arista_simple>> grafo, reves;
 vector<arista> nuevas;
 
-vector<long long> dijkstra(vector<vector<arista_simple>> g, long long s){
-    vector<long long> distancias;
-    vector<bool> visitados = vector<bool>(N+1, false);
-    distancias.resize(N+1, inf);
+vector<int> dijkstra(vector<vector<arista_simple>> &g, int s){
+    vector<int> distancias;
+    distancias.assign(N+1, inf);
     distancias[s] = 0;
 
     priority_queue<arista_simple, vector<arista_simple>, greater<arista_simple>> min_heap;
     min_heap.push({0, s});
 
     while (!min_heap.empty()){
-        long long dist, u;
+        int dist, u;
         tie(dist, u) = min_heap.top();
         min_heap.pop();
 
-        if (visitados[u]){
+        if (distancias[u] < dist){
             continue;
         }
-
-        visitados[u] = true;
 
         for (auto [w, v] : g[u]){
             //relajacion
@@ -42,14 +43,18 @@ vector<long long> dijkstra(vector<vector<arista_simple>> g, long long s){
     return distancias;
 }
 
-long long costoOptimizado(long long s, long long t){
-    vector<long long> ds = dijkstra(grafo, s);
-    vector<long long> dt = dijkstra(reves, t);
-    long long dist = ds[t];
+int costoOptimizado(int s, int t){
+    vector<int> ds = dijkstra(grafo, s);
+    vector<int> dt = dijkstra(reves, t);
+    int dist = inf;
 
-    for (auto [qj, uj, vj] : nuevas){
-        if (ds[uj] != inf && dt[vj] != inf && ds[uj] + qj + dt[vj] < dist)
-            dist = ds[uj] + qj + dt[vj];
+    for(int i = 0 ; i < nuevas.size() ; i++) {
+        int u, v, d;
+        tie(d,u,v) = nuevas[i];
+        dist = min(ds[t], dist); //verificamos si no es infinito
+        int temp = d + min(ds[u] + dt[v], ds[v] + dt[u]);
+        if (temp < dist)
+            dist = temp;
     }
 
     if (dist == inf) dist = -1; //en caso de que no exista camino devolvemos -1
@@ -57,32 +62,31 @@ long long costoOptimizado(long long s, long long t){
 }
 
 int main() {
-    long long C, k, s, t;
+    int C, k, s, t;
     cin >> C;
 
     while (C--){
         cin >> N >> M >> k >> s >> t;
+        reves.clear();
+        grafo.clear();
+        nuevas.clear();
         reves.resize(N+1);
         grafo.resize(N+1);
-        for (long long i = 0; i < M; i++){
-            long long d, c, l;
+        for (int i = 0; i < M; i++){
+            int d, c, l;
             cin >> d >> c >> l;
             grafo[d].push_back({l, c});
             reves[c].push_back({l, d});
         }
 
-        for (long long i = 0; i < k; i++){
-            long long uj, vj, qj;
+        for (int i = 0; i < k; i++){
+            int uj, vj, qj;
             cin >> uj >> vj >> qj;
             nuevas.push_back({qj, uj, vj});
         }
 
-        long long res = costoOptimizado(s, t);
+        int res = costoOptimizado(s, t);
         cout << res << endl;
-
-        reves.clear();
-        grafo.clear();
-        nuevas.clear();
 
         //complejidad final: O((N+M)logN)
     }
