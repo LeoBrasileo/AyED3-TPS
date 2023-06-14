@@ -56,7 +56,10 @@ int flujoMaximo(vector<vector<int>> &g, vector<vector<int>> &capacidades){
 }
 
 void scan() {
-    cin >> N >> M;
+    bool p;
+    int temp, a, b;
+    scanf("%d", &N);
+    scanf("%d", &M);
     if (N == 0 && M == 0)
         return;
 
@@ -64,11 +67,11 @@ void scan() {
     //de 1 a N son los nodos de los estudiantes
     //el nodo N+1 es el nodo sumidero (Kruskal)
 
-    vector<vector<int>> g = vector<vector<int>>(N+2, vector<int>());
+    vector<vector<int>> g = vector<vector<int>>(N+2);
     vector<vector<int>> capacidades = vector<vector<int>>(N+2, vector<int>(N+2, 0));
     for (int i = 1; i <= N; i++) {
-        bool p;
-        cin >> p;
+        scanf("%d", &temp);
+        p = temp;
         if (p){
             g[0].push_back(i);
             capacidades[0][i] = 1;
@@ -78,8 +81,8 @@ void scan() {
         }
     }
     for (int i = 0; i < M; i++) {
-        int a, b;
-        cin >> a >> b;
+        scanf("%d", &a);
+        scanf("%d", &b);
         g[a].push_back(b);
         g[b].push_back(a);
         //las asmistades son bidireccionales
@@ -88,7 +91,7 @@ void scan() {
     }
 
     int corteMinimo = flujoMaximo(g, capacidades);
-    cout << corteMinimo << endl;
+    printf("%d \n", corteMinimo);
 
     scan();
 }
