@@ -77,7 +77,7 @@ double medirTiempo(int s, int t){
 }
 
 int main() {
-    output_file.open("runtime_basic.csv", ios::app);
+    output_file.open("runtime_minheap.csv", ios::app);
     int C, k, s, t;
     cin >> C;
 
