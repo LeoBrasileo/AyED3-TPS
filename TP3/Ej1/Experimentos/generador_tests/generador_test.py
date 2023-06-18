@@ -5,12 +5,15 @@ nombre = input("Nombre de archivo\n")
 
 with open(f"../{nombre}.txt", "w") as archivo:
     lineas = [f"{c}\n"]
-    n_usado = []
+
+    n_usado = set()
     for i in range(c):
-        N = random.randint(1, 10)
-        while N not in n_usado:
+
+        while True:
             N = random.randint(1, 10)
-            n_usado.append(N)
+            if N not in n_usado:
+                n_usado.add(N)
+                break
 
         #M = random.randint(1, 100000)
 
@@ -37,21 +40,22 @@ with open(f"../{nombre}.txt", "w") as archivo:
             lineas.append(linea)
 
         # Creo array de combinanciones hechas
-        combinaciones_hechas = []
-        for i in range(N):
-            combinaciones = [i]
-            combinaciones_hechas.append(combinaciones)
+        combinaciones_hechas = set()
+        for i in range(N + 1):
+            combinaciones_hechas.add((i,))
 
+        print(combinaciones_hechas)
 
         for nuevas_calles in range(k):
             desde = random.randint(1, N)
             hasta = random.randint(1, N)
 
-            while hasta not in combinaciones_hechas[desde]:
+            while (desde, hasta) in combinaciones_hechas or (hasta, desde) in combinaciones_hechas or desde == hasta:
+                desde = random.randint(1, N)
                 hasta = random.randint(1, N)
 
-            combinaciones_hechas[desde].append(hasta)
-            combinaciones_hechas[hasta].append(desde)
+            combinaciones_hechas.add((desde, hasta))
+            combinaciones_hechas.add((hasta, desde))
 
             longitud = random.randint(1, 1000)
             linea = "{} {} {}\n".format(desde, hasta, longitud)
