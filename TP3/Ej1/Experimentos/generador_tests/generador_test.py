@@ -27,13 +27,17 @@ with open(f"../{nombre}.txt", "w") as archivo:
 
         lineas.append("{} {} {} {} {}\n".format(N,N,k,s,t))
 
+        combinaciones_hechas = set()
+
         for calle in range(N):
             desde = random.randint(1, N)
-
-            # No puede ser iguales desde y hasta
             hasta = random.randint(1, N)
-            while hasta==desde:
+
+            while (desde, hasta) in combinaciones_hechas or desde == hasta:
+                desde = random.randint(1, N)
                 hasta = random.randint(1, N)
+            
+            combinaciones_hechas.add((desde, hasta))
 
             longitud = random.randint(1, 1000)
             linea = "{} {} {}\n".format(desde, hasta, longitud)
@@ -43,8 +47,6 @@ with open(f"../{nombre}.txt", "w") as archivo:
         combinaciones_hechas = set()
         for i in range(N + 1):
             combinaciones_hechas.add((i,))
-
-        print(combinaciones_hechas)
 
         for nuevas_calles in range(k):
             desde = random.randint(1, N)
