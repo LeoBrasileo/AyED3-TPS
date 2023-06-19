@@ -17,22 +17,24 @@ vector<int> dijkstra(vector<vector<arista_simple>> &g, int s){
     distancias.assign(N+1, inf);
     distancias[s] = 0;
 
-    vector<bool> visitados = vector<bool>(N+1, false);
+    // remplazamos la cola por un conjunto (set)
+    set<arista_simple> probados;
+    probados.insert({0, s});
 
-    for (int i = 0; i < N; i++) {
-        int u = -1;
-        for (int j = 1; j <= N; j++) {
-            if (!visitados[j] && (u == -1 || distancias[j] < distancias[u])) {
-                u = j;
-            }
+    while (!probados.empty()){
+        int dist = probados.begin()->first;
+        int u = probados.begin()->second;
+        probados.erase(probados.begin());
+
+        if (distancias[u] < dist){
+            continue;
         }
 
-        visitados[u] = true;
-
-        for (auto [w, v] : g[u]) {
-            // Relajación
-            if (distancias[u] != inf && distancias[v] > distancias[u] + w) {
+        for (auto [w, v] : g[u]){
+            //relajacion
+            if(distancias[u] != inf && distancias[v] > distancias[u] + w){
                 distancias[v] = distancias[u] + w;
+                probados.insert({distancias[v], v});
             }
         }
     }
