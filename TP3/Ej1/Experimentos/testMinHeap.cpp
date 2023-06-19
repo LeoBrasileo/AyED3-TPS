@@ -101,10 +101,11 @@ int main() {
             nuevas.push_back({qj, uj, vj});
         }
 
-        int tiempo = medirTiempo(s, t);
+        double tiempo = medirTiempo(s, t);
 
         output_file << N << "," << tiempo << "\n";
     }
 
     return 0;
 }
+
