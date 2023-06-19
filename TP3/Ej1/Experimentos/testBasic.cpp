@@ -12,29 +12,35 @@ ofstream output_file;
 vector<vector<arista_simple>> grafo, reves;
 vector<arista> nuevas;
 
+int minDistance(vector<int>& distancias, vector<bool>& visitados) {
+    int minDist = inf;
+    int minIndex = 0;
+
+    for (int i = 1; i < distancias.size(); i++) {
+        if (!visitados[i] && distancias[i] <= minDist) {
+            minDist = distancias[i];
+            minIndex = i;
+        }
+    }
+
+    return minIndex;
+}
+
 vector<int> dijkstra(vector<vector<arista_simple>> &g, int s){
     vector<int> distancias;
     distancias.assign(N+1, inf);
     distancias[s] = 0;
 
-    // remplazamos la cola por un conjunto (set)
-    set<arista_simple> probados;
-    probados.insert({0, s});
+    vector<bool> visitados = vector<bool>(N+1, false);
 
-    while (!probados.empty()){
-        int dist = probados.begin()->first;
-        int u = probados.begin()->second;
-        probados.erase(probados.begin());
+    for (int i = 1; i <= N - 1; i++) {
+        int u = minDistance(distancias, visitados); // nodo con la distancia mínima
+        visitados[u] = true;
 
-        if (distancias[u] < dist){
-            continue;
-        }
-
-        for (auto [w, v] : g[u]){
-            //relajacion
-            if(distancias[u] != inf && distancias[v] > distancias[u] + w){
+        // Actualizar las distancias de los vecinos de u
+        for (auto [w, v] : g[u]) {
+            if (!visitados[v] && distancias[u] != inf && distancias[u] + w < distancias[v]) {
                 distancias[v] = distancias[u] + w;
-                probados.insert({distancias[v], v});
             }
         }
     }
@@ -61,20 +67,14 @@ int costoOptimizado(int s, int t){
 }
 
 double medirTiempo(int s, int t){
-    int repeat = 10;
-    double counter = 0;
+    auto start = chrono::high_resolution_clock::now();
 
-    for (int ignore = 0; ignore < repeat; ignore++){
-        auto start = chrono::high_resolution_clock::now();
+    costoOptimizado(s, t);
 
-        costoOptimizado(s, t);
+    auto stop = chrono::high_resolution_clock::now();
 
-        auto stop = chrono::high_resolution_clock::now();
-        chrono::duration<double> diff = stop - start;
-        counter += diff.count();
-    }
-
-    return counter / repeat;
+    chrono::duration<double> diff = stop - start;
+    return diff.count();
 }
 
 int main() {
@@ -104,7 +104,7 @@ int main() {
 
         double tiempo = medirTiempo(s, t);
 
-        output_file << N << "," << tiempo << "\n";
+        output_file << M << "," << tiempo << "\n";
     }
 
     return 0;

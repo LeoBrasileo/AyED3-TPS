@@ -105,7 +105,7 @@ int main() {
 
         double tiempo = medirTiempo(s, t);
 
-        output_file << N << "," << tiempo << "\n";
+        output_file << M << "," << tiempo << "\n";
     }
 
     return 0;
