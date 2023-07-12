@@ -7,7 +7,7 @@ OUTPUT_PATH := bin
 all: benchmark
 
 benchmark: app
-	@time $(OUTPUT_PATH)/app < test.txt
+	@time $(OUTPUT_PATH)/app < tests/test.txt
 
 app: main.cpp
 	@mkdir -p $(OUTPUT_PATH)
