@@ -5,7 +5,6 @@
 
 using namespace std;
 
-// Struct actividad para poder guardar además la posicion
 struct Actividad {
     int inicio;
     int final;
@@ -57,31 +56,33 @@ vector<Actividad> maximizarActividades(){
 
 
 int main() {
-    int repeat = 10;
-    double counter = 0;
     ofstream output_file; output_file.open("runtime.csv", ios::app);
-    //output_file << "n,time\n";
-
-    cin >> N;
+    int C; cin >> C;
+    while (C--)
+    {
+        cin >> N;
     
-    actividades.resize(N);
-    for (int i=0; i<N; i++){
-        int s, t; cin >> s >> t;
-        actividades[i].inicio = s;
-        actividades[i].final = t;
-        actividades[i].posicion = i+1;
-    }
+        actividades.resize(N);
+        for (int i=0; i<N; i++){
+            int s, t; cin >> s >> t;
+            actividades[i].inicio = s;
+            actividades[i].final = t;
+            actividades[i].posicion = i+1;
+        }
 
-    for (int ignore=0; ignore<repeat; ignore++){
-        auto start = chrono::high_resolution_clock::now();
-        vector<Actividad> respuesta = maximizarActividades();
-        auto stop = chrono::high_resolution_clock::now();
-        chrono::duration<double> diff = stop - start;
-        counter += diff.count();
-    }
-    
+        int repeat = 10;
+        double counter = 0;
 
-    output_file << N << "," << counter / repeat << "\n";
+        for (int ignore=0; ignore<repeat; ignore++){
+            auto start = chrono::high_resolution_clock::now();
+            vector<Actividad> respuesta = maximizarActividades();
+            auto stop = chrono::high_resolution_clock::now();
+            chrono::duration<double> diff = stop - start;
+            counter += diff.count();
+        }
+
+        output_file << N << "," << counter / repeat << "\n";
+    }
     
     return 0;
 }
