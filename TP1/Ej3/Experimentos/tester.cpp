@@ -81,7 +81,7 @@ int main() {
             counter += diff.count();
         }
 
-        output_file << N << "," << counter / repeat << "\n";
+        output_file << N << ", " << counter / repeat << "\n";
     }
     
     return 0;
